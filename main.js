@@ -8,6 +8,7 @@ document.addEventListener('DOMContentLoaded', function () {
         event.preventDefault();
         addBook();
     })
+
 })
 
 document.addEventListener(RENDER_EVENT, function () {
@@ -103,12 +104,7 @@ function addCompleteList(bookID) {
 
     if (bookTarget == null) return;
 
-    if (bookTarget.isComplete) {
-        bookTarget.isComplete = false;
-    } else {
-        bookTarget.isComplete = true;
-    }
-
+    bookTarget.isComplete = bookTarget.isComplete ? false : true
     document.dispatchEvent(new Event(RENDER_EVENT));
 }
 
@@ -117,9 +113,10 @@ function removeBookList(bookID) {
 
     if (bookTarget == -1) return;
 
-    book_item.splice(bookTarget, 1);
-    document.dispatchEvent(new Event(RENDER_EVENT));
-
+    if (confirm(`Yakin ingin menghapus buku "${bookTarget.title}"?`)) {
+        book_item.splice(bookTarget, 1);
+        document.dispatchEvent(new Event(RENDER_EVENT));
+    }
 }
 
 function findBook(bookID) {
@@ -141,5 +138,30 @@ function findBook(bookID) {
     return null;
 }
 
+function search(query) {
+    return book_item.filter(bookItem => bookItem.title.toLowerCase().includes(query.toLowerCase()));
+}
 
 
+document.getElementById('searchBook').addEventListener('submit', function () {
+    event.preventDefault();
+    const query = document.getElementById('searchBookTitle').value;
+    const filteredBooks = search(query);
+    displaySearchResults(filteredBooks);
+})
+
+function displaySearchResults(filteredBooks) {
+    const incompleteBook = document.getElementById('incompleteBookshelfList');
+    incompleteBook.innerHTML = '';
+    const completeBook = document.getElementById('completeBookshelfList');
+    completeBook.innerHTML = '';
+
+    for (const bookItem of filteredBooks) {
+        const bookElement = makeBook(bookItem);
+        if (bookItem.isComplete) {
+            completeBook.append(bookElement);
+        } else {
+            incompleteBook.append(bookElement);
+        }
+    }
+}
