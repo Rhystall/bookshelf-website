@@ -8,7 +8,9 @@ document.addEventListener('DOMContentLoaded', function () {
         event.preventDefault();
         addBook();
     })
-
+    if (isStorageExist()) {
+        loadStorage();
+    }
 })
 
 document.addEventListener(RENDER_EVENT, function () {
@@ -26,6 +28,7 @@ document.addEventListener(RENDER_EVENT, function () {
             incompleteBook.append(bookElement);
         }
     }
+    updateLocal();
 })
 
 function generateID() {
@@ -53,7 +56,7 @@ function addBook() {
     book_item.push(bookItemObject);
 
     document.dispatchEvent(new Event(RENDER_EVENT))
-
+    updateLocal();
 }
 
 
@@ -106,6 +109,7 @@ function addCompleteList(bookID) {
 
     bookTarget.isComplete = bookTarget.isComplete ? false : true
     document.dispatchEvent(new Event(RENDER_EVENT));
+    updateLocal();
 }
 
 function removeBookList(bookID) {
@@ -117,6 +121,7 @@ function removeBookList(bookID) {
         book_item.splice(bookTarget, 1);
         document.dispatchEvent(new Event(RENDER_EVENT));
     }
+    updateLocal();
 }
 
 function findBook(bookID) {
@@ -164,4 +169,32 @@ function displaySearchResults(filteredBooks) {
             incompleteBook.append(bookElement);
         }
     }
+}
+
+function updateLocal() {
+    if (isStorageExist()) {
+        const parsed = JSON.stringify(book_item)
+        localStorage.setItem('book_item', parsed);
+    }
+}
+
+function isStorageExist() {
+    if (typeof (Storage) === undefined) {
+        alert('Browser kamu tidak mendukung local storage');
+        return false;
+    }
+    return true;
+}
+
+function loadStorage() {
+    const serializedData = localStorage.getItem('book_item');
+    let data = JSON.parse(serializedData);
+
+    if (data !== null) {
+        for (const book of data) {
+            book_item.push(book);
+        }
+    }
+
+    document.dispatchEvent(new Event(RENDER_EVENT));
 }
