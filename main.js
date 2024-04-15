@@ -150,7 +150,6 @@ function editBookListHandler(bookTarget) {
     const authorInput = form.querySelector('#inputBookAuthor');
     const yearInput = form.querySelector('#inputBookYear');
     const isCompleteInput = form.querySelector('#inputBookIsComplete');
-    const buttonEdit = document.getElementById('bookEdit');
 
     titleInput.value = bookTarget.title;
     authorInput.value = bookTarget.author;
@@ -168,6 +167,7 @@ function editBookListHandler(bookTarget) {
         form.reset();
         document.dispatchEvent(new Event(RENDER_EVENT));
         updateLocal();
+        isEditing = false;
     });
 }
 
@@ -175,9 +175,7 @@ function editBook(bookID) {
     const bookTarget = findBook(bookID);
     if (bookTarget == null) return;
 
-    isEditing = true
-    const submitBook = document.getElementById('inputBook');
-    submitBook.removeEventListener('submit', addBookHandler);
+    isEditing = true;
     editBookListHandler(bookTarget);
 }
 
