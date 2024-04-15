@@ -3,11 +3,7 @@ const RENDER_EVENT = 'render_book';
 
 
 document.addEventListener('DOMContentLoaded', function () {
-    const submitBook = document.getElementById('inputBook');
-    submitBook.addEventListener('submit', function (event) {
-        event.preventDefault();
-        addBook();
-    })
+    addBookHandler();
     if (isStorageExist()) {
         loadStorage();
     }
@@ -59,6 +55,14 @@ function addBook() {
     updateLocal();
 }
 
+function addBookHandler() {
+    const submitBook = document.getElementById('inputBook');
+    submitBook.addEventListener('submit', function (event) {
+        event.preventDefault();
+        addBook();
+    });
+}
+
 
 function makeBook(bookItemObject) {
     const bookTitle = document.createElement('h3');
@@ -91,7 +95,7 @@ function makeBook(bookItemObject) {
     });
 
     editButton.addEventListener('click', function () {
-        editBookList(bookItemObject.id);
+        editBook(bookItemObject.id);
     });
 
     removeButton.addEventListener('click', function () {
@@ -132,11 +136,8 @@ function removeBookList(bookID) {
     updateLocal();
 }
 
-function editBookList(bookID) {
-    const bookTarget = findBook(bookID);
 
-    if (bookTarget == null) return;
-
+function editBookListHandler(bookTarget) {
     const form = document.getElementById('inputBook');
     const titleInput = form.querySelector('#inputBookTitle');
     const authorInput = form.querySelector('#inputBookAuthor');
@@ -160,6 +161,15 @@ function editBookList(bookID) {
         document.dispatchEvent(new Event(RENDER_EVENT));
         updateLocal();
     });
+}
+
+function editBook(bookID) {
+    const bookTarget = findBook(bookID);
+    if (bookTarget == null) return;
+
+    const submitBook = document.getElementById('inputBook');
+    submitBook.removeEventListener('submit', addBookHandler);
+    editBookListHandler(bookTarget);
 }
 
 
