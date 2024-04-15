@@ -143,6 +143,7 @@ function editBookListHandler(bookTarget) {
     const authorInput = form.querySelector('#inputBookAuthor');
     const yearInput = form.querySelector('#inputBookYear');
     const isCompleteInput = form.querySelector('#inputBookIsComplete');
+    const buttonEdit = document.getElementById('buttonEdit');
 
     titleInput.value = bookTarget.title;
     authorInput.value = bookTarget.author;
