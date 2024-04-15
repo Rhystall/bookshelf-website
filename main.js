@@ -82,8 +82,16 @@ function makeBook(bookItemObject) {
     removeButton.classList.add('red');
     removeButton.innerText = 'Hapus Buku';
 
+    const editButton = document.createElement('button');
+    editButton.classList.add('yellow');
+    editButton.innerText = 'Edit Buku';
+
     completeButton.addEventListener('click', function () {
         addCompleteList(bookItemObject.id);
+    });
+
+    editButton.addEventListener('click', function () {
+        editBookList(bookItemObject.id);
     });
 
     removeButton.addEventListener('click', function () {
@@ -92,7 +100,7 @@ function makeBook(bookItemObject) {
 
     const actionContainer = document.createElement('div');
     actionContainer.classList.add('action');
-    actionContainer.append(completeButton, removeButton);
+    actionContainer.append(completeButton, editButton, removeButton);
 
     const bookContainer = document.createElement('article');
     bookContainer.classList.add('book_item');
@@ -124,15 +132,37 @@ function removeBookList(bookID) {
     updateLocal();
 }
 
-function findBook(bookID) {
-    for (const index in book_item) {
-        if (book_item[index].id === bookID) {
-            return index;
-        }
-    }
+function editBookList(bookID) {
+    const bookTarget = findBook(bookID);
 
-    return -1;
+    if (bookTarget == null) return;
+
+    const form = document.getElementById('inputBook');
+    const titleInput = form.querySelector('#inputBookTitle');
+    const authorInput = form.querySelector('#inputBookAuthor');
+    const yearInput = form.querySelector('#inputBookYear');
+    const isCompleteInput = form.querySelector('#inputBookIsComplete');
+
+    titleInput.value = bookTarget.title;
+    authorInput.value = bookTarget.author;
+    yearInput.value = bookTarget.year;
+    isCompleteInput.checked = bookTarget.isComplete;
+
+    form.style.display = 'block';
+
+    form.addEventListener('submit', function (event) {
+        event.preventDefault();
+        bookTarget.title = titleInput.value;
+        bookTarget.author = authorInput.value;
+        bookTarget.year = yearInput.value;
+        bookTarget.isComplete = isCompleteInput.checked;
+        form.reset();
+        document.dispatchEvent(new Event(RENDER_EVENT));
+        updateLocal();
+    });
 }
+
+
 
 function findBook(bookID) {
     for (const bookItem of book_item) {
