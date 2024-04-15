@@ -178,3 +178,7 @@ p {
     background-color: darkred;
     color: white;
 }
+
+#bookEdit {
+    margin-top: 10px;
+}

@@ -1,4 +1,5 @@
 const book_item = [];
+let isEditing = false;
 const RENDER_EVENT = 'render_book';
 
 
@@ -59,7 +60,13 @@ function addBookHandler() {
     const submitBook = document.getElementById('inputBook');
     submitBook.addEventListener('submit', function (event) {
         event.preventDefault();
-        addBook();
+        if (!isEditing) {
+            addBook();
+        } else {
+            isEditing = false;
+            document.dispatchEvent(new Event(RENDER_EVENT));
+            updateLocal();
+        }
     });
 }
 
@@ -143,7 +150,7 @@ function editBookListHandler(bookTarget) {
     const authorInput = form.querySelector('#inputBookAuthor');
     const yearInput = form.querySelector('#inputBookYear');
     const isCompleteInput = form.querySelector('#inputBookIsComplete');
-    const buttonEdit = document.getElementById('buttonEdit');
+    const buttonEdit = document.getElementById('bookEdit');
 
     titleInput.value = bookTarget.title;
     authorInput.value = bookTarget.author;
@@ -168,6 +175,7 @@ function editBook(bookID) {
     const bookTarget = findBook(bookID);
     if (bookTarget == null) return;
 
+    isEditing = true
     const submitBook = document.getElementById('inputBook');
     submitBook.removeEventListener('submit', addBookHandler);
     editBookListHandler(bookTarget);
