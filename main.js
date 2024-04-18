@@ -60,13 +60,10 @@ function addBookHandler() {
     const submitBook = document.getElementById('inputBook');
     submitBook.addEventListener('submit', function (event) {
         event.preventDefault();
-        if (!isEditing) {
-            addBook();
-        } else {
-            isEditing = false;
-            document.dispatchEvent(new Event(RENDER_EVENT));
-            updateLocal();
-        }
+        addBook();
+        document.dispatchEvent(new Event(RENDER_EVENT));
+        updateLocal();
+
     });
 }
 
@@ -132,15 +129,16 @@ function addCompleteList(bookID) {
 }
 
 function removeBookList(bookID) {
-    const bookTarget = findBook(bookID);
+    const index = book_item.findIndex(book => book.id === bookID);
 
-    if (bookTarget == -1) return;
+    if (index === -1) return;
 
+    const bookTarget = book_item[index];
     if (confirm(`Yakin ingin menghapus buku "${bookTarget.title}"?`)) {
-        book_item.splice(bookTarget, 1);
+        book_item.splice(index, 1);
         document.dispatchEvent(new Event(RENDER_EVENT));
+        updateLocal();
     }
-    updateLocal();
 }
 
 
@@ -150,6 +148,7 @@ function editBookListHandler(bookTarget) {
     const authorInput = form.querySelector('#inputBookAuthor');
     const yearInput = form.querySelector('#inputBookYear');
     const isCompleteInput = form.querySelector('#inputBookIsComplete');
+    const editButton = form.querySelector('#bookEdit');
 
     titleInput.value = bookTarget.title;
     authorInput.value = bookTarget.author;
@@ -158,24 +157,31 @@ function editBookListHandler(bookTarget) {
 
     form.style.display = 'block';
 
-    form.addEventListener('submit', function (event) {
+    editButton.addEventListener('click', function (event) {
         event.preventDefault();
-        bookTarget.title = titleInput.value;
-        bookTarget.author = authorInput.value;
-        bookTarget.year = yearInput.value;
-        bookTarget.isComplete = isCompleteInput.checked;
-        form.reset();
+        const index = book_item.findIndex(book => book.id === bookTarget.id);
+        if (index !== -1) {
+            book_item[index].title = titleInput.value;
+            book_item[index].author = authorInput.value;
+            book_item[index].year = yearInput.value;
+            book_item[index].isComplete = isCompleteInput.checked;
+        }
         document.dispatchEvent(new Event(RENDER_EVENT));
         updateLocal();
+        form.reset();
         isEditing = false;
+        document.getElementById('bookEdit').style.display = 'none';
     });
 }
+
+
 
 function editBook(bookID) {
     const bookTarget = findBook(bookID);
     if (bookTarget == null) return;
 
     isEditing = true;
+    document.getElementById('bookEdit').style.display = 'block';
     editBookListHandler(bookTarget);
 }
 
