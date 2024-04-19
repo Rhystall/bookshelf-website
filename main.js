@@ -148,7 +148,7 @@ function editBookListHandler(bookTarget) {
     const authorInput = form.querySelector('#inputBookAuthor');
     const yearInput = form.querySelector('#inputBookYear');
     const isCompleteInput = form.querySelector('#inputBookIsComplete');
-    const editButton = form.querySelector('#bookEdit');
+    let editButton = form.querySelector('#bookEdit');
 
     titleInput.value = bookTarget.title;
     authorInput.value = bookTarget.author;
@@ -157,20 +157,28 @@ function editBookListHandler(bookTarget) {
 
     form.style.display = 'block';
 
+    // Menghapus event listener agar tidak terduplikasi dengan cara mengcole button tersebut dan menggantinya
+    const newEditButton = editButton.cloneNode(true);
+    editButton.parentNode.replaceChild(newEditButton, editButton);
+    editButton = newEditButton;
+
     editButton.addEventListener('click', function (event) {
         event.preventDefault();
         const index = book_item.findIndex(book => book.id === bookTarget.id);
         if (index !== -1) {
-            book_item[index].title = titleInput.value;
-            book_item[index].author = authorInput.value;
-            book_item[index].year = yearInput.value;
-            book_item[index].isComplete = isCompleteInput.checked;
+            book_item[index] = {
+                ...book_item[index],
+                title: titleInput.value,
+                author: authorInput.value,
+                year: yearInput.value,
+                isComplete: isCompleteInput.checked
+            };
+            document.dispatchEvent(new Event(RENDER_EVENT));
+            updateLocal();
+            form.reset();
+            isEditing = false;
+            document.getElementById('bookEdit').style.display = 'none';
         }
-        document.dispatchEvent(new Event(RENDER_EVENT));
-        updateLocal();
-        form.reset();
-        isEditing = false;
-        document.getElementById('bookEdit').style.display = 'none';
     });
 }
 
